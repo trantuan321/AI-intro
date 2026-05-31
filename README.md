@@ -118,14 +118,14 @@ Nhấn nút **"Phân Tích & Chẩn Đoán"** để xem kết quả.
 
 ```
 ┌─────────────────────────────────────────┐
-│            Giao diện người dùng          │
+│            Giao diện người dùng         │
 │         (HTML5 + CSS3 — 3 bước)         │
 └────────────────────┬────────────────────┘
                      │ Triệu chứng + Mức độ + Thời gian
                      ▼
-┌─────────────────────────────────────────┐
-│           Inference Engine              │
-│    (Forward Chaining + Weighted Score)  │
+┌────────────────────────────────────────┐
+│           Inference Engine             │
+│    (Forward Chaining + Weighted Score) │
 └──────────┬──────────────────┬──────────┘
            │                  │
            ▼                  ▼
@@ -138,7 +138,7 @@ Nhấn nút **"Phân Tích & Chẩn Đoán"** để xem kết quả.
                      ▼
 ┌─────────────────────────────────────────┐
 │              Kết quả                    │
-│  Chẩn đoán + Độ tin cậy + Fired Rules  │
+│  Chẩn đoán + Độ tin cậy + Fired Rules   │
 └─────────────────────────────────────────┘
 ```
 
