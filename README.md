@@ -1,210 +1,162 @@
-================================================================
-  HỆ THỐNG CHẨN ĐOÁN CẢM CÚM & DỊ ỨNG — TỔNG HỢP THÔNG TIN
-================================================================
+# 🩺 Hệ Thống Chuyên Gia Chẩn Đoán Cảm Cúm & Dị Ứng
 
-TỔNG QUAN
----------
-Tên ứng dụng : Hệ Thống Chẩn Đoán Cảm Cúm & Dị Ứng
-Loại         : Web app HTML đơn file (HTML + CSS + JavaScript)
-Ngôn ngữ     : Tiếng Việt
-Giao diện    : Dark theme, font Be Vietnam Pro + Playfair Display
-Màu nền      : #0d1117 (tối), gradient động phía sau
+> Bài Tập Lớn — Môn Nhập Môn Trí Tuệ Nhân Tạo  
+> Trường Đại học Bách Khoa Hà Nội
 
+---
 
-================================================================
-GIAO DIỆN & UX
-================================================================
-- Thanh tiến trình 3 bước (progress bar) hiển thị mức hoàn thành
-- Các card bo tròn với hover effect và animation slide-up/fade
-- Nút chẩn đoán bị vô hiệu hóa cho đến khi chọn ít nhất 1 triệu chứng
-- Kết quả hiện ra bên dưới và tự cuộn đến phần kết quả
-- Cảnh báo khẩn cấp hiện hộp đỏ khi có triệu chứng nguy hiểm
+## 📋 Mô tả
 
+Hệ thống chuyên gia hỗ trợ chẩn đoán sơ bộ **cảm cúm** và **dị ứng** dựa trên phương pháp **Rule-Based Reasoning** kết hợp thuật toán **Forward Chaining** với cơ chế **Weighted Scoring** động. Người dùng nhập các triệu chứng đang có, hệ thống suy luận và trả về kết quả chẩn đoán cùng giải thích chi tiết các luật đã được kích hoạt.
 
-================================================================
-LUỒNG NHẬP LIỆU — 3 BƯỚC
-================================================================
+---
 
-BƯỚC 1 — TRIỆU CHỨNG (checkbox, chọn nhiều)
---------------------------------------------
-Nhóm Cảm Cúm:
-  [sot]       Sốt cao >= 38°C
-  [dau_co]    Đau cơ / mỏi người
-  [dau_dau]   Đau đầu dữ dội
-  [met_moi]   Mệt mỏi / kiệt sức
-  [ho_khan]   Ho khan / ho nhiều
-  [dau_hong]  Đau họng
+## ⚙️ Yêu cầu hệ thống
 
-Nhóm Dị Ứng:
-  [hat_hoi]   Hắt hơi liên tục
-  [ngua_mat]  Ngứa mắt / chảy nước mắt
-  [ngua_mui]  Ngứa / chảy nước mũi
-  [phat_ban]  Phát ban / nổi mề đay
-  [ngua_da]   Ngứa da / nổi mẩn
-  [kho_tho]   Khó thở / tức ngực
-  [nghet_mui] Nghẹt mũi
-  [buon_non]  Buồn nôn / ói mửa
+| Thành phần | Yêu cầu |
+|---|---|
+| Trình duyệt | Chrome 90+, Firefox 88+, Edge 90+, Safari 14+ |
+| Kết nối internet | Chỉ cần khi tải font chữ lần đầu (tùy chọn) |
+| Hệ điều hành | Windows / macOS / Linux |
+| Phần mềm cài đặt | **Không yêu cầu** |
 
-BƯỚC 2 — MỨC ĐỘ TRIỆU CHỨNG (radio, chọn 1)
----------------------------------------------
-  [nhe]   Nhẹ   — không ảnh hưởng sinh hoạt
-  [vua]   Vừa   — hơi khó chịu
-  [nang]  Nặng  — ảnh hưởng nhiều
+---
 
-BƯỚC 3 — THỜI GIAN XUẤT HIỆN (radio, chọn 1)
----------------------------------------------
-  [1ngay]       Dưới 1 ngày
-  [3ngay]       1–3 ngày
-  [7ngay]       4–7 ngày
-  [14ngay]      Hơn 1 tuần
-  [thuongxuyen] Thường xuyên / theo mùa
+## 📦 Các gói phần mềm sử dụng
 
+Hệ thống được xây dựng hoàn toàn bằng công nghệ web tiêu chuẩn, **không phụ thuộc bất kỳ thư viện hay framework nào**. Toàn bộ mã nguồn nằm trong một file HTML duy nhất.
 
-================================================================
-KNOWLEDGE BASE — 11 LUẬT IF-THEN
-================================================================
+| Công nghệ | Phiên bản | Mục đích | Nguồn |
+|---|---|---|---|
+| HTML5 | Tiêu chuẩn W3C | Cấu trúc giao diện, form nhập liệu | Tích hợp sẵn trong trình duyệt |
+| CSS3 | Tiêu chuẩn W3C | Giao diện dark mode, animation, responsive | Tích hợp sẵn trong trình duyệt |
+| JavaScript | ES6+ | Toàn bộ logic AI (Knowledge Base, Inference Engine, Weighted Scoring) | Tích hợp sẵn trong trình duyệt |
+| Google Fonts | API v2 | Font chữ: *Be Vietnam Pro*, *Playfair Display* | Tải tự động qua CDN (cần internet) |
 
---- LUẬT CẢM CÚM ---
+> **Lưu ý:** Google Fonts chỉ được dùng để hiển thị font chữ. Nếu không có kết nối internet, hệ thống vẫn hoạt động bình thường với font mặc định của trình duyệt.
 
-R1 | Cảm cúm điển hình
-   Điều kiện : sốt AND đau cơ AND mệt mỏi
-   Kết luận  : flu
-   Trọng số  : 3
+---
 
-R2 | Cúm có ho và đau họng
-   Điều kiện : sốt AND ho khan AND đau họng
-   Kết luận  : flu
-   Trọng số  : 2.5
+## 🚀 Hướng dẫn cài đặt và chạy chương trình
 
-R3 | Cúm với đau đầu
-   Điều kiện : sốt AND đau đầu dữ dội AND mệt mỏi
-   Kết luận  : flu
-   Trọng số  : 2
+### Bước 1 — Tải mã nguồn
 
-R4 | Cúm đường tiêu hóa
-   Điều kiện : sốt AND buồn nôn AND mệt mỏi
-   Kết luận  : flu
-   Trọng số  : 1.5
+```
+chan-doan-benh.html
+```
 
---- LUẬT DỊ ỨNG ---
+Đảm bảo file `chan-doan-benh.html` đã được tải về máy.
 
-R5 | Dị ứng đường hô hấp
-   Điều kiện : hắt hơi AND ngứa mũi AND ngứa mắt
-   Kết luận  : allergy
-   Trọng số  : 3
+### Bước 2 — Mở chương trình
 
-R6 | Dị ứng da
-   Điều kiện : phát ban AND ngứa da
-   Kết luận  : allergy
-   Trọng số  : 2.5
+**Cách 1 — Mở trực tiếp (khuyến nghị):**
 
-R7 | Dị ứng mũi đơn thuần
-   Điều kiện : hắt hơi AND nghẹt mũi AND ngứa mũi AND NOT sốt
-   Kết luận  : allergy
-   Trọng số  : 2
+Nhấp đúp vào file `chan-doan-benh.html` → trình duyệt mặc định sẽ tự động mở chương trình.
 
-R8 | Dị ứng hen suyễn
-   Điều kiện : khó thở AND (ngứa da OR phát ban)
-   Kết luận  : allergy
-   Trọng số  : 2
+**Cách 2 — Mở bằng trình duyệt cụ thể:**
 
-R9 | Dị ứng theo mùa
-   Điều kiện : hắt hơi AND ngứa mắt AND thời gian = thường xuyên
-   Kết luận  : allergy
-   Trọng số  : 2.5
+```
+# Windows
+start chrome chan-doan-benh.html
 
---- LUẬT CẢ HAI ---
+# macOS
+open -a "Google Chrome" chan-doan-benh.html
 
-R10 | Cúm kèm dị ứng
-    Điều kiện : sốt AND hắt hơi AND ngứa mắt
-    Kết luận  : both
-    Trọng số  : 2
+# Linux
+google-chrome chan-doan-benh.html
+# hoặc
+firefox chan-doan-benh.html
+```
 
-R11 | Tổng hợp nhiều triệu chứng
-    Điều kiện : >= 2 triệu chứng cúm AND >= 2 triệu chứng dị ứng
-    Kết luận  : both
-    Trọng số  : 2
+**Cách 3 — Dùng Live Server (VS Code):**
 
+Nếu có cài Visual Studio Code và extension **Live Server**:
+1. Mở thư mục chứa file trong VS Code
+2. Chuột phải vào `chan-doan-benh.html` → chọn **"Open with Live Server"**
 
-================================================================
-ENGINE CHẨN ĐOÁN — CÁCH TÍNH ĐIỂM
-================================================================
+> ✅ Không cần cài đặt Node.js, Python hay bất kỳ runtime nào.  
+> ✅ Không cần chạy lệnh build hay compile.  
+> ✅ Không cần kết nối internet (ngoại trừ font chữ).
 
-Mỗi luật thỏa điều kiện → cộng trọng số vào nhóm tương ứng (flu / allergy / both)
+---
 
-Hệ số điều chỉnh:
-  - Mức độ Nặng (nang)                          : trọng số × 1.3
-  - Mức độ Nhẹ  (nhe)                           : trọng số × 0.8
-  - Thời gian thường xuyên + luật dị ứng        : trọng số × 1.3
-  - Thời gian 7 ngày hoặc 14 ngày + luật cúm    : trọng số × 1.1
+## 📖 Hướng dẫn sử dụng
 
-Xác định kết quả:
-  1. Nếu scores.both > max(flu, allergy) × 0.7  → kết luận: BOTH (cả hai)
-  2. Nếu scores.flu >= scores.allergy            → kết luận: FLU (cảm cúm)
-  3. Ngược lại                                   → kết luận: ALLERGY (dị ứng)
-  4. Không có luật nào kích hoạt                 → kết luận: HEALTHY (không rõ)
+Sau khi mở chương trình trên trình duyệt, thực hiện theo 3 bước:
 
-Công thức độ tin cậy:
-  confidence = min(round((maxScore / (total + 2)) × 100 + 30), 92)
-  Tối đa 92% — không áp dụng cho trường hợp "healthy"
+**Bước 1 — Chọn triệu chứng**  
+Tích chọn tất cả các triệu chứng hiện đang có trong hai nhóm:
+- Nhóm triệu chứng cảm cúm (7 triệu chứng)
+- Nhóm triệu chứng dị ứng (6 triệu chứng)
 
+**Bước 2 — Chọn mức độ**  
+Chọn một trong ba mức độ:
+- 🟢 Nhẹ — không ảnh hưởng sinh hoạt
+- 🟡 Vừa — hơi khó chịu
+- 🔴 Nặng — ảnh hưởng nhiều
 
-================================================================
-KẾT QUẢ CHẨN ĐOÁN — 4 TRƯỜNG HỢP
-================================================================
+**Bước 3 — Chọn thời gian**  
+Chọn thời gian xuất hiện triệu chứng:
+- Dưới 1 ngày / 1–3 ngày / 4–7 ngày / Hơn 1 tuần / Thường xuyên theo mùa
 
-1. FLU — Cảm Cúm (màu #ff7b72)
-   "Có dấu hiệu Cảm Cúm — Nhiễm virus influenza, phổ biến mùa lạnh và giao mùa"
-   Khuyến nghị:
-     - Nghỉ ngơi đầy đủ: ngủ đủ giấc, tránh hoạt động nặng
-     - Uống nhiều nước: bù nước để hạ sốt, làm loãng dịch hô hấp
-     - Theo dõi thân nhiệt: dùng Paracetamol khi sốt trên 38.5°C
-     - Đeo khẩu trang: tránh lây lan cho người già, trẻ em
-     - Thăm khám nếu sốt trên 39°C liên tục hơn 3 ngày
+Nhấn nút **"Phân Tích & Chẩn Đoán"** để xem kết quả.
 
-2. ALLERGY — Dị Ứng (màu #79c0ff)
-   "Có dấu hiệu Dị Ứng — Phản ứng miễn dịch với phấn hoa, bụi, thức ăn, thuốc..."
-   Khuyến nghị:
-     - Xác định dị nguyên: phấn hoa, lông thú, thức ăn, thuốc...
-     - Tránh tiếp xúc: vệ sinh môi trường, dùng máy lọc không khí
-     - Thuốc kháng histamine: Cetirizine, Loratadine
-     - Nhỏ mắt nếu cần: nước muối sinh lý hoặc thuốc nhỏ mắt kháng dị ứng
-     - Test dị ứng: skin test hoặc IgE để xác định chính xác dị nguyên
+---
 
-3. BOTH — Cúm + Dị Ứng (màu #ffa657)
-   "Có thể là Cúm và/hoặc Dị Ứng — Triệu chứng trùng lặp, cần đánh giá thêm"
-   Khuyến nghị:
-     - Theo dõi kỹ: ghi chép thời điểm và yếu tố kích hoạt
-     - Khám bác sĩ để phân biệt: xét nghiệm máu hoặc test dị ứng
-     - Uống đủ nước: hydrat hóa giúp cả hai tình trạng
-     - Nhật ký triệu chứng: ghi thời điểm, hoàn cảnh, môi trường
-     - Dùng thuốc đúng cách: không tự ý kết hợp nhiều loại thuốc
+## 📁 Cấu trúc dự án
 
-4. HEALTHY — Không rõ bệnh (màu #56d364)
-   "Chưa đủ cơ sở chẩn đoán — Triệu chứng không khớp rõ ràng"
-   Khuyến nghị:
-     - Tiếp tục theo dõi: quan sát thêm trong 24–48 giờ
-     - Nghỉ ngơi đủ giấc: 7–8 tiếng, giảm stress
-     - Dinh dưỡng tốt: bổ sung vitamin C và kẽm
-     - Vận động nhẹ nhàng: tăng cường miễn dịch
+```
+📦 BTL-NhapMonAI/
+├── 📄 chan-doan-benh.html     # Toàn bộ mã nguồn hệ thống (HTML + CSS + JS)
+├── 📄 README.md               # Tài liệu hướng dẫn (file này)
+└── 📄 BaoCao_BTL.pdf          # Báo cáo bài tập lớn
+```
+
+---
+
+## 🧠 Kiến trúc hệ thống
+
+```
+┌─────────────────────────────────────────┐
+│            Giao diện người dùng          │
+│         (HTML5 + CSS3 — 3 bước)         │
+└────────────────────┬────────────────────┘
+                     │ Triệu chứng + Mức độ + Thời gian
+                     ▼
+┌─────────────────────────────────────────┐
+│           Inference Engine              │
+│    (Forward Chaining + Weighted Score)  │
+└──────────┬──────────────────┬──────────┘
+           │                  │
+           ▼                  ▼
+┌──────────────────┐  ┌──────────────────┐
+│  Knowledge Base  │  │  Working Memory  │
+│  (11 luật IF–    │  │  (13 triệu chứng │
+│   THEN có W)     │  │   + ngữ cảnh)    │
+└──────────────────┘  └──────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│              Kết quả                    │
+│  Chẩn đoán + Độ tin cậy + Fired Rules  │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## ⚠️ Lưu ý quan trọng
+
+> Kết quả của hệ thống **chỉ mang tính tham khảo**, không thay thế chẩn đoán của bác sĩ. Vui lòng tham khảo ý kiến chuyên gia y tế khi triệu chứng nặng hoặc kéo dài.
+
+---
+
+## 👥 Thông tin nhóm
+
+| Họ và tên | MSSV | Vai trò |
+|---|---|---|
+| Phan Phạm Tuấn Anh | 202416410 | Đưa ra ý tưởng nội dung, thực hiện, viết báo cáo |
+| Lê Vĩnh Quốc | 202416595 | Đưa ra ý tưởng thuật toán, thực hiện, thuyết trình |
 
 
-================================================================
-CẢNH BÁO KHẨN CẤP
-================================================================
-Hiện hộp cảnh báo đỏ khi thỏa một trong các điều kiện sau:
-  - Khó thở kết hợp với sốt HOẶC phát ban
-  - Mức độ triệu chứng chọn là Nặng
-
-Nội dung cảnh báo:
-  "Triệu chứng của bạn có thể nghiêm trọng. Vui lòng đến cơ sở y tế
-   sớm nhất có thể hoặc gọi đường dây y tế khẩn cấp nếu khó thở nặng."
-
-
-================================================================
-DISCLAIMER
-================================================================
-Đây là công cụ hỗ trợ tham khảo, KHÔNG thay thế tư vấn y tế chuyên nghiệp.
-Vui lòng gặp bác sĩ nếu triệu chứng nghiêm trọng hoặc kéo dài.
-
-================================================================
+**Giảng viên hướng dẫn:** PGS.TS. Lê Thanh Hương  
+**Học kỳ:** II — Năm học 2025 - 2026
