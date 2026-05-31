@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hệ Thống Chẩn Đoán Cảm Cúm & Dị Ứng</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --accent-blue: #58a6ff;
+    --accent-teal: #39d353;
+    --accent-orange: #f78166;
+    --accent-yellow: #e3b341;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #484f58;
+    --flu-color: #ff7b72;
+    --allergy-color: #79c0ff;
+    --both-color: #ffa657;
+    --healthy-color: #56d364;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(ellipse at 20% 20%, rgba(88, 166, 255, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(57, 211, 83, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(255, 123, 114, 0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.6s ease;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid rgba(88, 166, 255, 0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--accent-blue);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .dot-pulse {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #e6edf3 0%, #8b949e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* Progress */
+  .progress-bar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 20px;
+    animation: slideUp 0.4s ease;
+    transition: border-color 0.3s ease;
+  }
+
+  .card:hover { border-color: #444c56; }
+
+  /* Section title */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .section-title h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .section-title span {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-left: auto;
+    font-weight: 400;
+  }
+
+  /* Symptoms grid */
+  .symptoms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .symptom-item {
+    position: relative;
+  }
+
+  .symptom-item input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .symptom-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .symptom-label:hover {
+    border-color: #444c56;
+    color: var(--text-primary);
+    background: #1c2333;
+  }
+
+  .symptom-item input:checked + .symptom-label {
+    border-color: var(--accent-blue);
+    background: rgba(88, 166, 255, 0.08);
+    color: var(--text-primary);
+  }
+
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    font-size: 11px;
+  }
+
+  .symptom-item input:checked + .symptom-label .check-box {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+  }
+
+  .symptom-emoji {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* Severity */
+  .severity-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .severity-option {
+    position: relative;
+  }
+
+  .severity-option input { display: none; }
+
+  .severity-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+
+  .severity-btn:hover { border-color: #444c56; color: var(--text-primary); }
+
+  .severity-option input:checked + .severity-btn {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .severity-option[data-value="nhe"] input:checked + .severity-btn {
+    border-color: var(--healthy-color);
+    background: rgba(86, 211, 100, 0.08);
+    color: var(--healthy-color);
+  }
+
+  .severity-option[data-value="vua"] input:checked + .severity-btn {
+    border-color: var(--accent-yellow);
+    background: rgba(227, 179, 65, 0.08);
+    color: var(--accent-yellow);
+  }
+
+  .severity-option[data-value="nang"] input:checked + .severity-btn {
+    border-color: var(--flu-color);
+    background: rgba(255, 123, 114, 0.08);
+    color: var(--flu-color);
+  }
+
+  /* Duration */
+  .duration-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .duration-option {
+    position: relative;
+  }
+
+  .duration-option input { display: none; }
+
+  .duration-btn {
+    padding: 10px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+
+  .duration-btn:hover { border-color: #444c56; color: var(--text-primary); }
+
+  .duration-option input:checked + .duration-btn {
+    border-color: var(--accent-blue);
+    background: rgba(88, 166, 255, 0.08);
+    color: var(--accent-blue);
+  }
+
+  /* Diagnose button */
+  .diagnose-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #1f6feb, #388bfd);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .diagnose-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .diagnose-btn:hover::before { left: 100%; }
+  .diagnose-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(31, 111, 235, 0.3); }
+  .diagnose-btn:active { transform: translateY(0); }
+  .diagnose-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Result */
+  #result {
+    display: none;
+    animation: slideUp 0.5s ease;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .result-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .result-meta { flex: 1; }
+
+  .result-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .result-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .confidence-bar {
+    margin: 20px 0;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+  }
+
+  .confidence-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  .confidence-label { color: var(--text-secondary); }
+  .confidence-value { font-weight: 700; font-size: 15px; }
+
+  .conf-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .conf-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+  }
+
+  /* Rules */
+  .rules-applied {
+    margin-top: 20px;
+  }
+
+  .rules-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .rule-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .rule-text { color: var(--text-secondary); }
+  .rule-text strong { color: var(--text-primary); }
+
+  /* Recommendations */
+  .recommendations {
+    margin-top: 20px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .rec-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .rec-icon { font-size: 20px; flex-shrink: 0; }
+
+  .rec-content { flex: 1; }
+
+  .rec-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+
+  .rec-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* Warning */
+  .warning-box {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255, 123, 114, 0.07);
+    border: 1px solid rgba(255, 123, 114, 0.2);
+    border-radius: 10px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #ff9492;
+    line-height: 1.6;
+  }
+
+  /* Reset */
+  .reset-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    transition: all 0.2s ease;
+    margin-top: 12px;
+  }
+
+  .reset-btn:hover { border-color: #444c56; color: var(--text-primary); background: var(--surface2); }
+
+  /* Disclaimer */
+  .disclaimer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 16px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* Color themes per disease */
+  .theme-flu .result-icon { background: rgba(255, 123, 114, 0.12); }
+  .theme-flu .result-tag { background: rgba(255, 123, 114, 0.12); color: var(--flu-color); }
+  .theme-flu .result-title { color: var(--flu-color); }
+  .theme-flu .conf-fill { background: linear-gradient(90deg, #ff7b72, #ffa198); }
+  .theme-flu .rule-badge { background: rgba(255, 123, 114, 0.15); color: var(--flu-color); }
+
+  .theme-allergy .result-icon { background: rgba(121, 192, 255, 0.12); }
+  .theme-allergy .result-tag { background: rgba(121, 192, 255, 0.12); color: var(--allergy-color); }
+  .theme-allergy .result-title { color: var(--allergy-color); }
+  .theme-allergy .conf-fill { background: linear-gradient(90deg, #79c0ff, #a5d6ff); }
+  .theme-allergy .rule-badge { background: rgba(121, 192, 255, 0.15); color: var(--allergy-color); }
+
+  .theme-both .result-icon { background: rgba(255, 166, 87, 0.12); }
+  .theme-both .result-tag { background: rgba(255, 166, 87, 0.12); color: var(--both-color); }
+  .theme-both .result-title { color: var(--both-color); }
+  .theme-both .conf-fill { background: linear-gradient(90deg, #ffa657, #ffcc8a); }
+  .theme-both .rule-badge { background: rgba(255, 166, 87, 0.15); color: var(--both-color); }
+
+  .theme-healthy .result-icon { background: rgba(86, 211, 100, 0.12); }
+  .theme-healthy .result-tag { background: rgba(86, 211, 100, 0.12); color: var(--healthy-color); }
+  .theme-healthy .result-title { color: var(--healthy-color); }
+  .theme-healthy .conf-fill { background: linear-gradient(90deg, #56d364, #a2f4a9); }
+  .theme-healthy .rule-badge { background: rgba(86, 211, 100, 0.15); color: var(--healthy-color); }
+
+  @media (max-width: 480px) {
+    .symptoms-grid { grid-template-columns: 1fr 1fr; }
+    .card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-badge">
+      <div class="dot-pulse"></div>
+      Hệ thống chuyên gia y tế
+    </div>
+    <h1>Chẩn Đoán Cảm Cúm<br>& Dị Ứng</h1>
+    <p class="subtitle">Dựa trên luật suy luận IF–THEN • Nhập triệu chứng để nhận kết quả</p>
+  </header>
+
+  <div class="progress-bar">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 / 3 bước</div>
+  </div>
+
+  <!-- BƯỚC 1: Triệu chứng -->
+  <div class="card" id="step1">
+    <div class="section-title">
+      <div class="section-icon" style="background: rgba(88,166,255,0.1);">🩺</div>
+      <h2>Triệu chứng đang gặp</h2>
+      <span>Chọn tất cả phù hợp</span>
+    </div>
+    <div class="symptoms-grid">
+      <!-- Nhóm cảm cúm -->
+      <div class="symptom-item">
+        <input type="checkbox" id="s_sot" value="sot" onchange="updateProgress()">
+        <label class="symptom-label" for="s_sot">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">🌡️</span>
+          Sốt cao ≥ 38°C
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_dau_co" value="dau_co" onchange="updateProgress()">
+        <label class="symptom-label" for="s_dau_co">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">😫</span>
+          Đau cơ / mỏi người
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_dau_dau" value="dau_dau" onchange="updateProgress()">
+        <label class="symptom-label" for="s_dau_dau">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">🤕</span>
+          Đau đầu dữ dội
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_met_moi" value="met_moi" onchange="updateProgress()">
+        <label class="symptom-label" for="s_met_moi">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">😴</span>
+          Mệt mỏi / kiệt sức
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_ho_khan" value="ho_khan" onchange="updateProgress()">
+        <label class="symptom-label" for="s_ho_khan">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">😮‍💨</span>
+          Ho khan / ho nhiều
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_dau_hong" value="dau_hong" onchange="updateProgress()">
+        <label class="symptom-label" for="s_dau_hong">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">🤧</span>
+          Đau họng
+        </label>
+      </div>
+      <!-- Nhóm dị ứng -->
+      <div class="symptom-item">
+        <input type="checkbox" id="s_hat_hoi" value="hat_hoi" onchange="updateProgress()">
+        <label class="symptom-label" for="s_hat_hoi">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">🤧</span>
+          Hắt hơi liên tục
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_ngua_mat" value="ngua_mat" onchange="updateProgress()">
+        <label class="symptom-label" for="s_ngua_mat">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">👁️</span>
+          Ngứa mắt / chảy nước mắt
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_ngua_mui" value="ngua_mui" onchange="updateProgress()">
+        <label class="symptom-label" for="s_ngua_mui">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">👃</span>
+          Ngứa / chảy nước mũi
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_phat_ban" value="phat_ban" onchange="updateProgress()">
+        <label class="symptom-label" for="s_phat_ban">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">🔴</span>
+          Phát ban / nổi mề đay
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_ngua_da" value="ngua_da" onchange="updateProgress()">
+        <label class="symptom-label" for="s_ngua_da">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">🖐️</span>
+          Ngứa da / nổi mẩn
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_kho_tho" value="kho_tho" onchange="updateProgress()">
+        <label class="symptom-label" for="s_kho_tho">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">😤</span>
+          Khó thở / tức ngực
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_nghet_mui" value="nghet_mui" onchange="updateProgress()">
+        <label class="symptom-label" for="s_nghet_mui">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">😶</span>
+          Nghẹt mũi
+        </label>
+      </div>
+      <div class="symptom-item">
+        <input type="checkbox" id="s_buon_non" value="buon_non" onchange="updateProgress()">
+        <label class="symptom-label" for="s_buon_non">
+          <div class="check-box">✓</div>
+          <span class="symptom-emoji">🤢</span>
+          Buồn nôn / ói mửa
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- BƯỚC 2: Mức độ -->
+  <div class="card" id="step2">
+    <div class="section-title">
+      <div class="section-icon" style="background: rgba(227,179,65,0.1);">📊</div>
+      <h2>Mức độ triệu chứng</h2>
+    </div>
+    <div class="severity-options">
+      <div class="severity-option" data-value="nhe">
+        <input type="radio" name="severity" id="sev_nhe" value="nhe" onchange="updateProgress()">
+        <label class="severity-btn" for="sev_nhe">🟢 Nhẹ — không ảnh hưởng sinh hoạt</label>
+      </div>
+      <div class="severity-option" data-value="vua">
+        <input type="radio" name="severity" id="sev_vua" value="vua" onchange="updateProgress()">
+        <label class="severity-btn" for="sev_vua">🟡 Vừa — hơi khó chịu</label>
+      </div>
+      <div class="severity-option" data-value="nang">
+        <input type="radio" name="severity" id="sev_nang" value="nang" onchange="updateProgress()">
+        <label class="severity-btn" for="sev_nang">🔴 Nặng — ảnh hưởng nhiều</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- BƯỚC 3: Thời gian -->
+  <div class="card" id="step3">
+    <div class="section-title">
+      <div class="section-icon" style="background: rgba(57,211,83,0.1);">⏱️</div>
+      <h2>Thời gian xuất hiện triệu chứng</h2>
+    </div>
+    <div class="duration-options">
+      <div class="duration-option">
+        <input type="radio" name="duration" id="dur_1" value="1ngay" onchange="updateProgress()">
+        <label class="duration-btn" for="dur_1">Dưới 1 ngày</label>
+      </div>
+      <div class="duration-option">
+        <input type="radio" name="duration" id="dur_3" value="3ngay" onchange="updateProgress()">
+        <label class="duration-btn" for="dur_3">1–3 ngày</label>
+      </div>
+      <div class="duration-option">
+        <input type="radio" name="duration" id="dur_7" value="7ngay" onchange="updateProgress()">
+        <label class="duration-btn" for="dur_7">4–7 ngày</label>
+      </div>
+      <div class="duration-option">
+        <input type="radio" name="duration" id="dur_14" value="14ngay" onchange="updateProgress()">
+        <label class="duration-btn" for="dur_14">Hơn 1 tuần</label>
+      </div>
+      <div class="duration-option">
+        <input type="radio" name="duration" id="dur_long" value="thuongxuyen" onchange="updateProgress()">
+        <label class="duration-btn" for="dur_long">Thường xuyên / theo mùa</label>
+      </div>
+    </div>
+  </div>
+
+  <button class="diagnose-btn" id="diagnoseBtn" onclick="diagnose()">
+    🔍 &nbsp;Phân Tích & Chẩn Đoán
+  </button>
+
+  <!-- KẾT QUẢ -->
+  <div id="result">
+    <div class="card" id="resultCard">
+      <div class="result-header" id="resultHeader"></div>
+      <div class="confidence-bar" id="confidenceBar"></div>
+      <div class="rules-applied" id="rulesApplied"></div>
+    </div>
+
+    <div class="card" id="recCard">
+      <div class="section-title">
+        <div class="section-icon" style="background: rgba(57,211,83,0.1);">💊</div>
+        <h2>Khuyến nghị</h2>
+      </div>
+      <div class="recommendations" id="recommendations"></div>
+      <div id="warningBox"></div>
+    </div>
+
+    <button class="reset-btn" onclick="reset()">↺ Nhập lại triệu chứng mới</button>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ Đây là công cụ hỗ trợ tham khảo, không thay thế tư vấn y tế chuyên nghiệp.<br>
+    Vui lòng gặp bác sĩ nếu triệu chứng nghiêm trọng hoặc kéo dài.
+  </div>
+
+</div>
+
+<script>
+// =====================================================
+// KNOWLEDGE BASE - Luật IF-THEN
+// =====================================================
+const RULES = [
+  // === QUY TẮC CẢM CÚM ===
+  {
+    id: 'R1',
+    name: 'Cảm cúm điển hình',
+    condition: (s) => s.sot && s.dau_co && s.met_moi,
+    conclusion: 'flu',
+    weight: 3,
+    description: 'IF <strong>sốt cao</strong> AND <strong>đau cơ</strong> AND <strong>mệt mỏi</strong> THEN cảm cúm'
+  },
+  {
+    id: 'R2',
+    name: 'Cúm có ho và đau họng',
+    condition: (s) => s.sot && s.ho_khan && s.dau_hong,
+    conclusion: 'flu',
+    weight: 2.5,
+    description: 'IF <strong>sốt</strong> AND <strong>ho khan</strong> AND <strong>đau họng</strong> THEN cảm cúm'
+  },
+  {
+    id: 'R3',
+    name: 'Cúm với đau đầu',
+    condition: (s) => s.sot && s.dau_dau && s.met_moi,
+    conclusion: 'flu',
+    weight: 2,
+    description: 'IF <strong>sốt</strong> AND <strong>đau đầu dữ dội</strong> AND <strong>mệt mỏi</strong> THEN cảm cúm'
+  },
+  {
+    id: 'R4',
+    name: 'Cúm đường tiêu hóa',
+    condition: (s) => s.sot && s.buon_non && s.met_moi,
+    conclusion: 'flu',
+    weight: 1.5,
+    description: 'IF <strong>sốt</strong> AND <strong>buồn nôn</strong> AND <strong>mệt mỏi</strong> THEN cảm cúm'
+  },
+  // === QUY TẮC DỊ ỨNG ===
+  {
+    id: 'R5',
+    name: 'Dị ứng đường hô hấp',
+    condition: (s) => s.hat_hoi && s.ngua_mui && s.ngua_mat,
+    conclusion: 'allergy',
+    weight: 3,
+    description: 'IF <strong>hắt hơi</strong> AND <strong>ngứa mũi</strong> AND <strong>ngứa mắt</strong> THEN dị ứng'
+  },
+  {
+    id: 'R6',
+    name: 'Dị ứng da',
+    condition: (s) => s.phat_ban && s.ngua_da,
+    conclusion: 'allergy',
+    weight: 2.5,
+    description: 'IF <strong>phát ban</strong> AND <strong>ngứa da</strong> THEN dị ứng da'
+  },
+  {
+    id: 'R7',
+    name: 'Dị ứng mũi đơn thuần',
+    condition: (s) => s.hat_hoi && s.nghet_mui && s.ngua_mui && !s.sot,
+    conclusion: 'allergy',
+    weight: 2,
+    description: 'IF <strong>hắt hơi</strong> AND <strong>nghẹt mũi</strong> AND <strong>ngứa mũi</strong> AND NOT sốt THEN dị ứng'
+  },
+  {
+    id: 'R8',
+    name: 'Dị ứng hen suyễn',
+    condition: (s) => s.kho_tho && (s.ngua_da || s.phat_ban),
+    conclusion: 'allergy',
+    weight: 2,
+    description: 'IF <strong>khó thở</strong> AND (<strong>ngứa da</strong> OR <strong>phát ban</strong>) THEN dị ứng / hen'
+  },
+  {
+    id: 'R9',
+    name: 'Dị ứng theo mùa',
+    condition: (s, dur) => s.hat_hoi && s.ngua_mat && dur === 'thuongxuyen',
+    conclusion: 'allergy',
+    weight: 2.5,
+    description: 'IF <strong>hắt hơi</strong> AND <strong>ngứa mắt</strong> AND <strong>thường xuyên/theo mùa</strong> THEN dị ứng theo mùa'
+  },
+  // === QUY TẮC CẢ HAI ===
+  {
+    id: 'R10',
+    name: 'Cúm kèm dị ứng',
+    condition: (s) => s.sot && s.hat_hoi && s.ngua_mat,
+    conclusion: 'both',
+    weight: 2,
+    description: 'IF <strong>sốt</strong> AND <strong>hắt hơi</strong> AND <strong>ngứa mắt</strong> THEN cảm cúm + dị ứng'
+  },
+  {
+    id: 'R11',
+    name: 'Tổng hợp nhiều triệu chứng',
+    condition: (s) => {
+      const fluScore = [s.sot, s.dau_co, s.met_moi, s.ho_khan].filter(Boolean).length;
+      const allergyScore = [s.hat_hoi, s.ngua_mat, s.ngua_mui, s.phat_ban].filter(Boolean).length;
+      return fluScore >= 2 && allergyScore >= 2;
+    },
+    conclusion: 'both',
+    weight: 2,
+    description: 'IF ≥ 2 triệu chứng cúm AND ≥ 2 triệu chứng dị ứng THEN cả hai khả năng'
+  }
+];
+
+// =====================================================
+// ENGINE CHẨN ĐOÁN
+// =====================================================
+function getSymptoms() {
+  const checkboxes = document.querySelectorAll('.symptom-item input[type="checkbox"]:checked');
+  const symptoms = {};
+  checkboxes.forEach(cb => { symptoms[cb.value] = true; });
+  return symptoms;
+}
+
+function updateProgress() {
+  const hasSymptom = document.querySelectorAll('.symptom-item input:checked').length > 0;
+  const hasSeverity = document.querySelector('input[name="severity"]:checked');
+  const hasDuration = document.querySelector('input[name="duration"]:checked');
+  const steps = [hasSymptom, !!hasSeverity, !!hasDuration].filter(Boolean).length;
+  document.getElementById('progressFill').style.width = (steps / 3 * 100) + '%';
+  document.getElementById('progressLabel').textContent = `${steps} / 3 bước`;
+  document.getElementById('diagnoseBtn').disabled = !hasSymptom;
+}
+
+function diagnose() {
+  const symptoms = getSymptoms();
+  const severity = document.querySelector('input[name="severity"]:checked')?.value;
+  const duration = document.querySelector('input[name="duration"]:checked')?.value;
+
+  if (Object.keys(symptoms).length === 0) {
+    alert('Vui lòng chọn ít nhất một triệu chứng!');
+    return;
+  }
+
+  // Áp dụng luật
+  const scores = { flu: 0, allergy: 0, both: 0 };
+  const firedRules = [];
+
+  RULES.forEach(rule => {
+    if (rule.condition(symptoms, duration)) {
+      let w = rule.weight;
+      if (severity === 'nang') w *= 1.3;
+      if (severity === 'nhe') w *= 0.8;
+      if (duration === 'thuongxuyen' && rule.conclusion === 'allergy') w *= 1.3;
+      if (duration === '7ngay' || duration === '14ngay') {
+        if (rule.conclusion === 'flu') w *= 1.1;
+      }
+      scores[rule.conclusion] += w;
+      firedRules.push({ ...rule, finalWeight: w });
+    }
+  });
+
+  // Xác định kết quả
+  const total = scores.flu + scores.allergy + scores.both;
+  let diagnosis = 'healthy';
+  let maxScore = 0;
+
+  if (total > 0) {
+    if (scores.both > Math.max(scores.flu, scores.allergy) * 0.7) {
+      diagnosis = 'both'; maxScore = scores.both;
+    } else if (scores.flu >= scores.allergy) {
+      diagnosis = 'flu'; maxScore = scores.flu;
+    } else {
+      diagnosis = 'allergy'; maxScore = scores.allergy;
+    }
+  }
+
+  const confidence = total > 0 ? Math.min(Math.round((maxScore / (total + 2)) * 100 + 30), 92) : 0;
+  showResult(diagnosis, confidence, firedRules, symptoms, severity, duration);
+}
+
+function showResult(diagnosis, confidence, firedRules, symptoms, severity, duration) {
+  const configs = {
+    flu: {
+      theme: 'theme-flu', icon: '🤒', tag: 'Cảm Cúm',
+      title: 'Có dấu hiệu Cảm Cúm',
+      subtitle: 'Nhiễm virus influenza — phổ biến vào mùa lạnh và giao mùa',
+      confColor: '#ff7b72',
+      recs: [
+        { icon: '🛏️', title: 'Nghỉ ngơi đầy đủ', desc: 'Ngủ đủ giấc, tránh hoạt động nặng để cơ thể phục hồi' },
+        { icon: '💧', title: 'Uống nhiều nước', desc: 'Bù nước để hạ sốt và làm loãng dịch tiết đường hô hấp' },
+        { icon: '🌡️', title: 'Theo dõi thân nhiệt', desc: 'Dùng hạ sốt Paracetamol khi sốt trên 38.5°C' },
+        { icon: '😷', title: 'Đeo khẩu trang', desc: 'Tránh lây lan cho người xung quanh, đặc biệt người già và trẻ em' },
+        { icon: '🩺', title: 'Thăm khám nếu cần', desc: 'Gặp bác sĩ nếu sốt trên 39°C liên tục hơn 3 ngày' },
+      ]
+    },
+    allergy: {
+      theme: 'theme-allergy', icon: '🌸', tag: 'Dị Ứng',
+      title: 'Có dấu hiệu Dị Ứng',
+      subtitle: 'Phản ứng miễn dịch với dị nguyên — phấn hoa, bụi, thức ăn, thuốc...',
+      confColor: '#79c0ff',
+      recs: [
+        { icon: '🔍', title: 'Xác định dị nguyên', desc: 'Tìm nguyên nhân gây dị ứng: phấn hoa, lông thú, thức ăn, thuốc...' },
+        { icon: '🧹', title: 'Tránh tiếp xúc', desc: 'Vệ sinh môi trường, dùng máy lọc không khí, tránh dị nguyên đã biết' },
+        { icon: '💊', title: 'Thuốc kháng histamine', desc: 'Cetirizine, Loratadine có thể giúp giảm triệu chứng nhanh chóng' },
+        { icon: '👁️', title: 'Nhỏ mắt nếu cần', desc: 'Dùng nước muối sinh lý hoặc thuốc nhỏ mắt kháng dị ứng' },
+        { icon: '🏥', title: 'Test dị ứng', desc: 'Làm xét nghiệm skin test hoặc IgE để xác định chính xác dị nguyên' },
+      ]
+    },
+    both: {
+      theme: 'theme-both', icon: '🔶', tag: 'Cúm + Dị Ứng',
+      title: 'Có thể là Cúm và/hoặc Dị Ứng',
+      subtitle: 'Triệu chứng trùng lặp — cần đánh giá thêm để phân biệt',
+      confColor: '#ffa657',
+      recs: [
+        { icon: '📋', title: 'Theo dõi kỹ hơn', desc: 'Ghi chép thời điểm xuất hiện và yếu tố kích hoạt triệu chứng' },
+        { icon: '🩺', title: 'Khám bác sĩ để phân biệt', desc: 'Cần xét nghiệm máu hoặc test dị ứng để có chẩn đoán chính xác' },
+        { icon: '💧', title: 'Duy trì uống nước', desc: 'Hydrat hóa tốt giúp với cả hai tình trạng' },
+        { icon: '📓', title: 'Nhật ký triệu chứng', desc: 'Ghi lại thời điểm, hoàn cảnh, môi trường khi triệu chứng xuất hiện' },
+        { icon: '💊', title: 'Dùng thuốc đúng cách', desc: 'Không tự ý kết hợp nhiều loại thuốc — hỏi dược sĩ hoặc bác sĩ' },
+      ]
+    },
+    healthy: {
+      theme: 'theme-healthy', icon: '✅', tag: 'Không rõ bệnh',
+      title: 'Chưa đủ cơ sở chẩn đoán',
+      subtitle: 'Triệu chứng không khớp rõ ràng với cảm cúm hoặc dị ứng',
+      confColor: '#56d364',
+      recs: [
+        { icon: '💪', title: 'Tiếp tục theo dõi', desc: 'Quan sát thêm các triệu chứng trong 24-48 giờ tới' },
+        { icon: '😴', title: 'Nghỉ ngơi', desc: 'Đảm bảo ngủ đủ 7-8 tiếng và giảm stress' },
+        { icon: '🥗', title: 'Dinh dưỡng tốt', desc: 'Ăn uống đầy đủ, bổ sung vitamin C và kẽm' },
+        { icon: '🏃', title: 'Vận động nhẹ nhàng', desc: 'Tập thể dục vừa phải giúp tăng cường miễn dịch' },
+      ]
+    }
+  };
+
+  const cfg = configs[diagnosis];
+
+  // Header
+  document.getElementById('resultHeader').innerHTML = `
+    <div class="result-icon">${cfg.icon}</div>
+    <div class="result-meta">
+      <div class="result-tag">${cfg.tag}</div>
+      <div class="result-title">${cfg.title}</div>
+      <div class="result-subtitle">${cfg.subtitle}</div>
+    </div>
+  `;
+
+  // Confidence
+  document.getElementById('confidenceBar').innerHTML = `
+    <div class="confidence-row">
+      <span class="confidence-label">Độ tin cậy suy luận</span>
+      <span class="confidence-value" style="color:${cfg.confColor}">${diagnosis === 'healthy' ? 'N/A' : confidence + '%'}</span>
+    </div>
+    <div class="conf-track">
+      <div class="conf-fill" id="confFill" style="width: 0%; background: linear-gradient(90deg, ${cfg.confColor}, ${cfg.confColor}aa)"></div>
+    </div>
+  `;
+
+  // Rules
+  const rulesHTML = firedRules.length > 0
+    ? `<div class="rules-title">📐 Các luật đã kích hoạt (${firedRules.length})</div>` +
+      firedRules.map(r => `
+        <div class="rule-item">
+          <span class="rule-badge">${r.id}</span>
+          <span class="rule-text">${r.description}</span>
+        </div>
+      `).join('')
+    : `<div class="rules-title">📐 Luật kích hoạt</div>
+       <div class="rule-item"><span class="rule-text">Không có luật nào được kích hoạt với triệu chứng hiện tại.</span></div>`;
+
+  document.getElementById('rulesApplied').innerHTML = rulesHTML;
+
+  // Theme
+  document.getElementById('resultCard').className = `card ${cfg.theme}`;
+  document.getElementById('recCard').className = `card ${cfg.theme}`;
+
+  // Recommendations
+  document.getElementById('recommendations').innerHTML = cfg.recs.map(r => `
+    <div class="rec-item">
+      <span class="rec-icon">${r.icon}</span>
+      <div class="rec-content">
+        <div class="rec-title">${r.title}</div>
+        <div class="rec-desc">${r.desc}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Warning
+  const needsWarning = (symptoms.kho_tho && (symptoms.sot || symptoms.phat_ban)) ||
+                       (severity === 'nang');
+  document.getElementById('warningBox').innerHTML = needsWarning ? `
+    <div class="warning-box">
+      ⚠️ <span><strong>Lưu ý khẩn cấp:</strong> Triệu chứng của bạn có thể nghiêm trọng. Vui lòng đến cơ sở y tế sớm nhất có thể hoặc gọi đường dây y tế khẩn cấp nếu khó thở nặng.</span>
+    </div>
+  ` : '';
+
+  // Show
+  const resultDiv = document.getElementById('result');
+  resultDiv.style.display = 'block';
+  resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Animate confidence bar
+  setTimeout(() => {
+    if (diagnosis !== 'healthy') {
+      document.getElementById('confFill').style.width = confidence + '%';
+    }
+  }, 200);
+}
+
+function reset() {
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('input[type="radio"]').forEach(rb => rb.checked = false);
+  document.getElementById('result').style.display = 'none';
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Init
+updateProgress();
+</script>
+</body>
+</html>
