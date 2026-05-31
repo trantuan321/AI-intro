@@ -1,7 +1,7 @@
 # 🩺 Hệ Thống Chuyên Gia Chẩn Đoán Cảm Cúm & Dị Ứng
 
 > Bài Tập Lớn — Môn Nhập Môn Trí Tuệ Nhân Tạo  
-> Trường Đại học Bách Khoa Hà Nội
+> Đại học Bách Khoa Hà Nội
 
 ---
 
