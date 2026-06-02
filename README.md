@@ -154,8 +154,8 @@ Nhấn nút **"Phân Tích & Chẩn Đoán"** để xem kết quả.
 
 | Họ và tên | MSSV | Vai trò |
 |---|---|---|
-| Phan Phạm Tuấn Anh | 202416410 | Đưa ra ý tưởng nội dung, thực hiện, viết báo cáo |
-| Lê Vĩnh Quốc | 202416595 | Đưa ra ý tưởng thuật toán, thực hiện, thuyết trình |
+| Phan Phạm Tuấn Anh | 202416410 | Ý tưởng nội dung, thuật toán, viết báo cáo |
+| Lê Vĩnh Quốc | 202416595 | Ý tưởng nội dung, thuật toán, thuyết trình |
 
 
 **Giảng viên hướng dẫn:** PGS.TS. Lê Thanh Hương  
